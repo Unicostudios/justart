@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maren Voss — Paintings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400&family=Spectral:ital,wght@0,300;0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+  :root{
+    --charcoal:#1b1a17;
+    --charcoal-deep:#121110;
+    --linen:#ede6d6;
+    --linen-dim:#cfc6b0;
+    --oxide:#9a4232;
+    --ochre:#c9a227;
+    --verdigris:#3a4a3f;
+    --offwhite:#f5f1e8;
+    --line: rgba(237,230,214,0.14);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:auto;}
+  body{
+    background:var(--charcoal);
+    color:var(--offwhite);
+    font-family:'Spectral', serif;
+    overflow-x:hidden;
+    cursor:default;
+  }
+  ::selection{background:var(--oxide); color:var(--offwhite);}
+
+  .grain{
+    position:fixed; inset:0; pointer-events:none; z-index:500;
+    opacity:0.05; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- nav ---------- */
+  nav{
+    position:fixed; top:0; left:0; right:0; z-index:200;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:1.8rem 3.5rem;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase;
+    mix-blend-mode:difference;
+  }
+  nav a{color:var(--offwhite); text-decoration:none; opacity:0.85; transition:opacity .3s;}
+  nav a:hover{opacity:1;}
+  .nav-links{display:flex; gap:2.4rem;}
+
+  /* ---------- hero ---------- */
+  .hero{
+    height:100vh; position:relative;
+    display:flex; flex-direction:column; justify-content:center;
+    padding:0 3.5rem;
+    perspective:1000px;
+  }
+  .hero-eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.72rem; letter-spacing:0.18em; text-transform:uppercase;
+    color:var(--ochre); margin-bottom:1.4rem; opacity:0;
+  }
+  .hero h1{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:clamp(3.2rem, 10vw, 8.5rem);
+    line-height:0.92;
+    letter-spacing:-0.01em;
+  }
+  .hero h1 .line{display:block; overflow:hidden;}
+  .hero h1 .line span{display:inline-block; transform:translateY(110%);}
+  .hero h1 em{
+    font-style:italic; font-weight:400; color:var(--linen-dim);
+  }
+  .hero-sub{
+    margin-top:2rem; max-width:30ch;
+    font-size:1.05rem; line-height:1.7; color:var(--linen-dim);
+    opacity:0;
+  }
+  .hero-scroll{
+    position:absolute; bottom:3rem; left:3.5rem;
+    font-family:'JetBrains Mono', monospace; font-size:0.7rem;
+    letter-spacing:0.1em; text-transform:uppercase; color:var(--linen-dim);
+    display:flex; align-items:center; gap:0.8rem; opacity:0;
+  }
+  .hero-scroll .bar{width:1px; height:34px; background:var(--linen-dim); position:relative; overflow:hidden;}
+  .hero-scroll .bar::after{
+    content:''; position:absolute; top:0; left:0; width:100%; height:40%;
+    background:var(--ochre); animation:scrollbar 1.8s ease-in-out infinite;
+  }
+  @keyframes scrollbar{0%{transform:translateY(-100%);}100%{transform:translateY(250%);}}
+
+  .hero-frame{
+    position:absolute; right:6%; top:50%; transform:translateY(-50%) rotateY(-8deg) rotateX(2deg);
+    width:min(26vw, 320px); aspect-ratio:3/4;
+    border:10px solid var(--linen);
+    box-shadow:0 40px 80px -20px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,0,0,0.4);
+    background:linear-gradient(155deg,#7a3b2c 0%, #b5703f 28%, #d9b35c 52%, #3a4a3f 74%, #1b1a17 100%);
+  }
+  .hero-frame::before{
+    content:''; position:absolute; inset:0;
+    background:repeating-linear-gradient(115deg, rgba(0,0,0,0.07) 0px, transparent 2px, transparent 6px);
+    mix-blend-mode:multiply;
+  }
+
+  /* ---------- intro statement ---------- */
+  .statement{
+    min-height:80vh; display:flex; align-items:center;
+    padding:0 3.5rem; position:relative;
+  }
+  .statement p{
+    font-family:'Fraunces', serif; font-weight:300; font-style:italic;
+    font-size:clamp(1.6rem, 3.4vw, 2.6rem); line-height:1.45;
+    max-width:18ch; color:var(--linen);
+  }
+  .statement .accent{color:var(--oxide); font-style:normal; font-weight:500;}
+
+  /* ---------- gallery (horizontal scroll-jacked) ---------- */
+  .gallery-wrap{ position:relative; }
+  .gallery-pin{ height:100vh; overflow:hidden; position:relative; }
+  .gallery-rail{
+    height:100%; width:max-content;
+    display:flex; align-items:center; gap:7vw;
+    padding:0 12vw; will-change:transform;
+  }
+  .piece{
+    position:relative; flex:0 0 auto;
+    width:min(34vw, 440px);
+    display:flex; flex-direction:column; gap:1.6rem;
+  }
+  .piece .frame{
+    width:100%; aspect-ratio:4/5; position:relative;
+    border:14px solid var(--linen);
+    box-shadow:0 50px 90px -25px rgba(0,0,0,0.65), inset 0 0 0 1px rgba(0,0,0,0.3);
+    transform-style:preserve-3d; transition:transform .4s ease;
+  }
+  .piece .frame .canvas{
+    position:absolute; inset:0; overflow:hidden;
+  }
+  .piece .frame .canvas .sheen{
+    position:absolute; inset:0; opacity:0;
+    background:linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.18) 48%, transparent 60%);
+    transition:opacity .4s ease;
+  }
+  .piece:hover .frame .canvas .sheen{opacity:1;}
+  .piece:nth-child(odd) .frame{ transform:rotateY(4deg) rotateX(1deg); }
+  .piece:nth-child(even) .frame{ transform:rotateY(-4deg) rotateX(-1deg); }
+  .piece:hover .frame{ transform:rotateY(0) rotateX(0) scale(1.015); }
+
+  .placard{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    font-family:'JetBrains Mono', monospace; font-size:0.7rem;
+    letter-spacing:0.04em; color:var(--linen-dim);
+    border-top:1px solid var(--line); padding-top:0.9rem;
+  }
+  .placard .title{
+    font-family:'Fraunces', serif; font-style:italic; font-weight:400;
+    font-size:1.15rem; color:var(--offwhite); letter-spacing:0;
+    margin-bottom:0.3rem; display:block;
+  }
+  .placard .meta{text-transform:uppercase;}
+  .placard .num{
+    font-size:0.7rem; color:var(--ochre); text-align:right; white-space:nowrap; padding-left:1rem;
+  }
+
+  .gallery-track-label{
+    position:absolute; top:2.5rem; left:3.5rem; z-index:5;
+    font-family:'JetBrains Mono', monospace; font-size:0.72rem;
+    letter-spacing:0.16em; text-transform:uppercase; color:var(--linen-dim);
+    display:flex; gap:0.6rem; align-items:center;
+  }
+  .gallery-track-label .dot{width:5px; height:5px; border-radius:50%; background:var(--ochre);}
+
+  /* ---------- process / about ---------- */
+  .about{
+    padding:14vh 3.5rem; display:grid; grid-template-columns:1fr 1fr; gap:5vw;
+    border-top:1px solid var(--line);
+  }
+  .about-img{
+    aspect-ratio:4/5; position:relative; overflow:hidden;
+    background:linear-gradient(165deg,#3a4a3f, #1b1a17 60%, #6b3a2a);
+    box-shadow:0 30px 60px -20px rgba(0,0,0,0.6);
+  }
+  .about-img::after{
+    content:''; position:absolute; inset:0;
+    background:repeating-linear-gradient(100deg, rgba(255,255,255,0.04) 0px, transparent 3px, transparent 9px);
+  }
+  .about-copy{ display:flex; flex-direction:column; justify-content:center; }
+  .about-copy .label{
+    font-family:'JetBrains Mono', monospace; font-size:0.72rem; letter-spacing:0.16em;
+    text-transform:uppercase; color:var(--ochre); margin-bottom:1.4rem;
+  }
+  .about-copy h2{
+    font-family:'Fraunces', serif; font-weight:500; font-size:clamp(1.8rem,3.2vw,2.6rem);
+    line-height:1.2; margin-bottom:1.6rem;
+  }
+  .about-copy p{ color:var(--linen-dim); line-height:1.8; font-size:1rem; max-width:42ch; }
+  .about-copy p + p{margin-top:1.1rem;}
+
+  /* ---------- closing / contact ---------- */
+  .closing{
+    min-height:90vh; display:flex; flex-direction:column; justify-content:center;
+    padding:0 3.5rem; position:relative; border-top:1px solid var(--line);
+  }
+  .closing h2{
+    font-family:'Fraunces', serif; font-weight:500; font-style:italic;
+    font-size:clamp(2.6rem, 7vw, 5.8rem); line-height:1; max-width:14ch;
+  }
+  .closing-row{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    margin-top:4rem; padding-top:2rem; border-top:1px solid var(--line);
+    font-family:'JetBrains Mono', monospace; font-size:0.78rem;
+    letter-spacing:0.06em; color:var(--linen-dim); flex-wrap:wrap; gap:1.5rem;
+  }
+  .closing-row a{ color:var(--offwhite); text-decoration:none; border-bottom:1px solid var(--ochre); padding-bottom:2px; }
+  .closing-links{ display:flex; gap:2.2rem; }
+  footer{
+    padding:1.6rem 3.5rem; display:flex; justify-content:space-between;
+    font-family:'JetBrains Mono', monospace; font-size:0.68rem; color:var(--linen-dim);
+    letter-spacing:0.06em;
+  }
+
+  @media (max-width:780px){
+    nav{padding:1.4rem 1.4rem;}
+    .nav-links{gap:1.2rem;}
+    .hero, .statement, .about, .closing{padding:0 1.4rem;}
+    .hero-frame{display:none;}
+    .about{grid-template-columns:1fr; gap:2.5rem;}
+    .piece{width:78vw;}
+    .gallery-rail{padding:0 8vw; gap:10vw;}
+    .gallery-track-label{left:1.4rem; top:1.6rem;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+
+<nav>
+  <a href="#top" class="logo">Maren&nbsp;Voss</a>
+  <div class="nav-links">
+    <a href="#gallery">Works</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<section class="hero" id="top">
+  <p class="hero-eyebrow">Oil &amp; pigment, Berlin studio</p>
+  <h1>
+    <span class="line"><span>Painted in</span></span>
+    <span class="line"><span><em>slow</em> light.</span></span>
+  </h1>
+  <p class="hero-sub">A studio practice built on still rooms, worked surfaces, and color that takes its time. Scroll to walk the gallery.</p>
+  <div class="hero-scroll"><span class="bar"></span>Scroll</div>
+  <div class="hero-frame"></div>
+</section>
+
+<section class="statement">
+  <p>Every canvas starts as <span class="accent">an argument with the light</span> in the room — and ends somewhere neither of us expected.</p>
+</section>
+
+<section class="gallery-wrap" id="gallery">
+  <div class="gallery-pin">
+    <div class="gallery-track-label"><span class="dot"></span>Selected works, 2021–2025</div>
+    <div class="gallery-rail" id="rail">
+
+      <article class="piece">
+        <div class="frame"><div class="canvas" style="background:linear-gradient(160deg,#6b2f24 0%, #a85a35 35%, #d9b35c 60%, #4a5a44 85%);"><div class="sheen"></div></div></div>
+        <div class="placard">
+          <div><span class="title">Quiet Harbor</span><span class="meta">Oil on linen · 2024</span></div>
+          <div class="num">01 / 06</div>
+        </div>
+      </article>
+
+      <article class="piece">
+        <div class="frame"><div class="canvas" style="background:linear-gradient(200deg,#1b1a17 0%, #3a4a3f 40%, #6e7d5c 65%, #c9a227 100%);"><div class="sheen"></div></div></div>
+        <div class="placard">
+          <div><span class="title">Northwind</span><span class="meta">Oil on canvas · 2023</span></div>
+          <div class="num">02 / 06</div>
+        </div>
+      </article>
+
+      <article class="piece">
+        <div class="frame"><div class="canvas" style="background:linear-gradient(135deg,#9a4232 0%, #c9a227 45%, #ede6d6 75%, #3a4a3f 100%);"><div class="sheen"></div></div></div>
+        <div class="placard">
+          <div><span class="title">Still Life, Late August</span><span class="meta">Oil on board · 2024</span></div>
+          <div class="num">03 / 06</div>
+        </div>
+      </article>
+
+      <article class="piece">
+        <div class="frame"><div class="canvas" style="background:linear-gradient(175deg,#2c241d 0%, #6b3a2a 30%, #b5703f 55%, #ede6d6 90%);"><div class="sheen"></div></div></div>
+        <div class="placard">
+          <div><span class="title">Interior, with Doubt</span><span class="meta">Oil on linen · 2022</span></div>
+          <div class="num">04 / 06</div>
+        </div>
+      </article>
+
+      <article class="piece">
+        <div class="frame"><div class="canvas" style="background:linear-gradient(150deg,#3a4a3f 0%, #1b1a17 45%, #9a4232 75%, #c9a227 100%);"><div class="sheen"></div></div></div>
+        <div class="placard">
+          <div><span class="title">Tide Table</span><span class="meta">Oil on canvas · 2025</span></div>
+          <div class="num">05 / 06</div>
+        </div>
+      </article>
+
+      <article class="piece">
+        <div class="frame"><div class="canvas" style="background:linear-gradient(120deg,#ede6d6 0%, #c9a227 30%, #9a4232 60%, #1b1a17 100%);"><div class="sheen"></div></div></div>
+        <div class="placard">
+          <div><span class="title">Self-Portrait, Unfinished</span><span class="meta">Oil on board · 2021</span></div>
+          <div class="num">06 / 06</div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<section class="about" id="about">
+  <div class="about-img"></div>
+  <div class="about-copy">
+    <p class="label">The studio</p>
+    <h2>Maren Voss works slowly, in a converted print shop in Neukölln.</h2>
+    <p>Trained at the Städelschule, she's spent the last decade returning to the same handful of subjects — rooms, harbors, the backs of chairs — letting the paint do the talking instead of the concept.</p>
+    <p>Her work has shown at Galerie Wagner, Kunsthalle Ost, and in private collections across Berlin, Lisbon, and Copenhagen. Commissions and studio visits by request.</p>
+  </div>
+</section>
+
+<section class="closing" id="contact">
+  <h2>Come see the paint in person.</h2>
+  <div class="closing-row">
+    <div class="closing-links">
+      <a href="mailto:hello@marenvoss.studio">hello@marenvoss.studio</a>
+      <a href="#">Instagram</a>
+      <a href="#">Studio visits</a>
+    </div>
+    <div>Neukölln, Berlin</div>
+  </div>
+</section>
+
+<footer>
+  <span>© 2026 Maren Voss</span>
+  <span>Built for exhibition</span>
+</footer>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+gsap.timeline({delay:0.2})
+  .to('.hero-eyebrow', {opacity:1, duration:0.6, ease:'power2.out'})
+  .to('.hero h1 .line span', {y:'0%', duration:0.9, stagger:0.12, ease:'power3.out'}, '-=0.3')
+  .to('.hero-sub', {opacity:1, duration:0.7}, '-=0.4')
+  .to('.hero-scroll', {opacity:1, duration:0.6}, '-=0.3')
+  .from('.hero-frame', {opacity:0, x:60, duration:1.1, ease:'power3.out'}, 0.3);
+
+gsap.to('.hero-frame', {
+  yPercent: 18, rotateY: -2, ease:'none',
+  scrollTrigger:{ trigger:'.hero', start:'top top', end:'bottom top', scrub:true }
+});
+
+gsap.to('.statement p', {
+  y:-40, ease:'none',
+  scrollTrigger:{ trigger:'.statement', start:'top bottom', end:'bottom top', scrub:true }
+});
+
+function buildGallery(){
+  const rail = document.getElementById('rail');
+  const pin = document.querySelector('.gallery-pin');
+  const distance = rail.scrollWidth - window.innerWidth;
+  if (distance <= 0) return null;
+
+  return gsap.to(rail, {
+    x: -distance, ease:'none',
+    scrollTrigger:{
+      trigger: pin,
+      start:'top top',
+      end: () => '+=' + (distance + window.innerHeight * 0.6),
+      scrub:true,
+      pin:true,
+      anticipatePin:1,
+      invalidateOnRefresh:true
+    }
+  });
+}
+let galleryTween = buildGallery();
+
+document.querySelectorAll('.piece').forEach((piece, i)=>{
+  gsap.fromTo(piece, {opacity:0.4, scale:0.94}, {
+    opacity:1, scale:1, ease:'none',
+    scrollTrigger:{
+      trigger: piece,
+      containerAnimation: galleryTween ? ScrollTrigger.getAll().find(st => st.trigger === document.querySelector('.gallery-pin')).animation : null,
+      start:'left 85%',
+      end:'left 35%',
+      scrub:true
+    }
+  });
+});
+
+gsap.from('.about-img', {
+  clipPath:'inset(0% 0% 100% 0%)', duration:1.1, ease:'power3.out',
+  scrollTrigger:{ trigger:'.about-img', start:'top 80%' }
+});
+gsap.from('.about-copy h2, .about-copy p, .about-copy .label', {
+  y:24, opacity:0, duration:0.8, stagger:0.08, ease:'power2.out',
+  scrollTrigger:{ trigger:'.about-copy', start:'top 75%' }
+});
+
+gsap.from('.closing h2', {
+  y:50, opacity:0, duration:1, ease:'power3.out',
+  scrollTrigger:{ trigger:'.closing', start:'top 70%' }
+});
+gsap.from('.closing-row', {
+  opacity:0, duration:0.8, delay:0.2,
+  scrollTrigger:{ trigger:'.closing', start:'top 70%' }
+});
+
+document.querySelectorAll('.piece').forEach(piece=>{
+  const frame = piece.querySelector('.frame');
+  piece.addEventListener('mousemove', e=>{
+    const r = piece.getBoundingClientRect();
+    const px = (e.clientX - r.left)/r.width - 0.5;
+    const py = (e.clientY - r.top)/r.height - 0.5;
+    gsap.to(frame, {rotateY: px*10, rotateX: -py*8, duration:0.4, ease:'power2.out'});
+  });
+  piece.addEventListener('mouseleave', ()=>{
+    gsap.to(frame, {rotateY:0, rotateX:0, duration:0.6, ease:'power3.out'});
+  });
+});
+
+window.addEventListener('resize', ()=>{
+  ScrollTrigger.refresh();
+});
+
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click', e=>{
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if(target) target.scrollIntoView({behavior:'smooth'});
+  });
+});
+</script>
+
+</body>
+</html>
